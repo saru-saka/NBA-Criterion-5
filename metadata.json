@@ -1,0 +1,6 @@
+{
+  "name": "NBA Faculty Information System",
+  "description": "An application to manage and calculate NBA Criterion 5 Faculty Information metrics including SFR, FQI, and Cadre Proportion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
