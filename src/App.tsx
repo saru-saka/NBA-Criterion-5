@@ -111,7 +111,7 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatCard title="Avg 5.1 SFR" value={averageSFR} label=": 1" subtitle="3 Year Average (Max 30)" color="bg-blue-600 text-white border-blue-700" />
               <StatCard title="Avg 5.2 FQI" value={averageFQI} label="Pts" subtitle="Qualification Index (Max 25)" color="bg-emerald-600 text-white border-emerald-700" />
-              <StatCard title="Avg 5.3 Cadre" value={averageCadre} label="Pts" subtitle="Proportion Match (Max 25)" color="bg-indigo-600 text-white border-indigo-700" />
+              <StatCard title="Avg 5.3 Cadre" value={averageCadre} label="Pts" subtitle="Cadre Proportion (Max 25)" color="bg-indigo-600 text-white border-indigo-700" />
               <StatCard title="Avg 5.5 Retention" value={averageRetention} label="/ 10" subtitle="Experience Metric (Max 10)" color="bg-slate-800 text-white border-slate-900" />
             </div>
 
