@@ -102,16 +102,45 @@ export default function App() {
     return Math.min(marks, 25).toFixed(2);
   };
 
+  const calculateRetention = (data: YearData) => {
+    if (facultyList.length === 0) return data.retentionScore;
+    
+    // NBA 5.5 Retention Calculation Logic (Simplified)
+    // Marks are based on percentage of faculty staying for >3 years
+    const stayingMoreThan3 = facultyList.filter(f => f.experience >= 3).length;
+    const total = facultyList.length;
+    const percentage = (stayingMoreThan3 / total) * 100;
+    
+    // Typically: 85%+=10, 75%+=8, 65%+=6, etc.
+    if (percentage >= 85) return "10.00";
+    if (percentage >= 75) return "8.00";
+    if (percentage >= 65) return "6.00";
+    if (percentage >= 55) return "4.00";
+    return "2.00";
+  };
+
   const averageSFR = (NBA_DATA.reduce((acc, curr) => acc + parseFloat(calculateSFR(curr)), 0) / 3).toFixed(2);
   const averageFQI = (NBA_DATA.reduce((acc, curr) => acc + parseFloat(calculateFQI(curr)), 0) / 3).toFixed(2);
   const averageCadre = (NBA_DATA.reduce((acc, curr) => acc + parseFloat(calculateCadre(curr)), 0) / 3).toFixed(2);
-  const averageRetention = (NBA_DATA.reduce((acc, curr) => acc + parseFloat(curr.retentionScore), 0) / 3).toFixed(2);
+  const averageRetention = (NBA_DATA.reduce((acc, curr) => acc + parseFloat(calculateRetention(NBA_DATA[0])), 0) / 3).toFixed(2);
 
   const filteredFaculty = facultyList.filter(f => 
     f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     f.degree.toLowerCase().includes(searchQuery.toLowerCase()) ||
     f.presentDesignation.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const downloadSample = () => {
+    const data = [
+      ["SN", "Faculty Name", "PAN", "Degree", "University", "Specialization", "Joining Date", "Experience (Years)", "Joining Designation", "Present Designation", "Nature", "Currently Associated (Y/N)"],
+      [1, "Dr. John Doe", "ABCDE1234F", "Ph.D", "Anna University", "CSE", "2018-06-15", 5.5, "Assistant Professor", "Associate Professor", "Regular", "Y"],
+      [2, "Jane Smith", "BCDEF2345G", "M.Tech", "VTU", "Software Engineering", "2021-01-10", 2.5, "Assistant Professor", "Assistant Professor", "Contract", "Y"]
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, "Faculty_Template.xlsx");
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -127,6 +156,12 @@ export default function App() {
             </div>
           </div>
           <div className="hidden md:flex gap-4">
+            <button 
+              onClick={downloadSample}
+              className="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all border border-slate-200"
+            >
+              Download Template
+            </button>
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -210,7 +245,7 @@ export default function App() {
                         <td className="px-8 py-5 text-center"><span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-black">{calculateSFR(data)}</span></td>
                         <td className="px-8 py-5 text-center text-emerald-600 font-bold">{calculateFQI(data)}</td>
                         <td className="px-8 py-5 text-center text-indigo-600 font-bold">{calculateCadre(data)}</td>
-                        <td className="px-8 py-5 text-center text-slate-600 font-bold">{data.retentionScore}</td>
+                        <td className="px-8 py-5 text-center text-slate-600 font-bold">{calculateRetention(data)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -511,7 +546,7 @@ export default function App() {
                       <tr key={idx}>
                         <td className="px-4 py-4 font-bold">{data.year}</td>
                         <td className="px-4 py-4 text-center font-medium font-mono">{facultyList.length || data.facultyCount}</td>
-                        <td className="px-4 py-4 text-center text-lg font-black text-slate-900">{data.retentionScore}</td>
+                        <td className="px-4 py-4 text-center text-lg font-black text-slate-900">{calculateRetention(data)}</td>
                       </tr>
                     ))}
                   </tbody>
