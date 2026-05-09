@@ -29,6 +29,10 @@ export interface YearData {
   associateProfessors: number;
   assistantProfessors: number;
   retentionScore: string;
+  experienceA: number; // >= 5 years
+  experienceB: number; // 3-5 years
+  experienceC: number; // 1-3 years
+  experienceD: number; // < 1 year
 }
 
 export const NBA_DATA: YearData[] = [
@@ -41,7 +45,11 @@ export const NBA_DATA: YearData[] = [
     professors: 5,
     associateProfessors: 5,
     assistantProfessors: 33,
-    retentionScore: "9.36"
+    retentionScore: "9.36",
+    experienceA: 90,
+    experienceB: 15,
+    experienceC: 10,
+    experienceD: 5
   },
   {
     year: "2024-25 (CAYm1)",
@@ -52,7 +60,11 @@ export const NBA_DATA: YearData[] = [
     professors: 5,
     associateProfessors: 3,
     assistantProfessors: 26,
-    retentionScore: "9.87"
+    retentionScore: "9.87",
+    experienceA: 95,
+    experienceB: 12,
+    experienceC: 12,
+    experienceD: 5
   },
   {
     year: "2023-24 (CAYm2)",
@@ -63,6 +75,10 @@ export const NBA_DATA: YearData[] = [
     professors: 4,
     associateProfessors: 2,
     assistantProfessors: 26,
-    retentionScore: "9.39"
+    retentionScore: "9.39",
+    experienceA: 85,
+    experienceB: 20,
+    experienceC: 15,
+    experienceD: 5
   }
 ];

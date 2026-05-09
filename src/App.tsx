@@ -195,7 +195,7 @@ export default function App() {
                 <GraduationCap />
                 5.2 Faculty Qualification
               </h2>
-              <p className="opacity-80 text-sm font-mono uppercase tracking-widest">Index = 2.5 * [(10X + 4Y) / RF]</p>
+              <p className="opacity-80 text-sm font-medium">Index = 2.5 * [(10X + 4Y) / RF]. RF = S/20.</p>
             </div>
             <div className="card-gradient bg-white p-8">
                <table className="w-full">
@@ -205,12 +205,12 @@ export default function App() {
                      <th className="py-4 text-center text-slate-900">X (Ph.D)</th>
                      <th className="py-4 text-center text-slate-900">Y (Masters)</th>
                      <th className="py-4 text-center text-slate-400">Required (RF)</th>
-                     <th className="py-4 text-center text-emerald-600">FQI Result</th>
+                     <th className="py-4 text-center text-emerald-600">FQI Result (Max 25)</th>
                    </tr>
                  </thead>
                  <tbody>
                    {NBA_DATA.map((data, idx) => (
-                     <tr key={idx} className="border-b last:border-0">
+                     <tr key={idx} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
                        <td className="py-6 font-bold">{data.year}</td>
                        <td className="py-6 text-center text-lg font-black">{data.phdCount}</td>
                        <td className="py-6 text-center text-lg font-black">{data.mastersCount}</td>
@@ -220,6 +220,126 @@ export default function App() {
                    ))}
                  </tbody>
                </table>
+            </div>
+          </div>
+        )}
+
+        {/* 5.3 Tab */}
+        {activeTab === '5.3' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-8 bg-indigo-700 text-white rounded-2xl shadow-xl">
+              <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
+                <UserCheck />
+                5.3 Faculty Cadre Proportion
+              </h2>
+              <p className="opacity-80 text-sm font-medium">Cadre Ratio Requirement (General): 1 Professor : 2 Associate Professors : 6 Assistant Professors</p>
+            </div>
+            
+            <div className="card-gradient bg-white p-8 overflow-x-auto">
+              <table className="w-full text-sm text-center">
+                <thead>
+                  <tr className="border-b bg-slate-50 text-[10px] uppercase font-black text-slate-500">
+                    <th rowSpan={2} className="px-4 py-4 text-left border-r">Year</th>
+                    <th colSpan={2} className="px-4 py-2 border-b border-r">Professors</th>
+                    <th colSpan={2} className="px-4 py-2 border-b border-r">Associate Prof.</th>
+                    <th colSpan={2} className="px-4 py-2 border-b border-r">Assistant Prof.</th>
+                    <th rowSpan={2} className="px-4 py-4 text-indigo-600">Total Marks</th>
+                  </tr>
+                  <tr className="border-b bg-slate-50 text-[10px] uppercase font-black text-slate-400">
+                    <th className="px-4 py-2 border-r">Required</th>
+                    <th className="px-4 py-2 border-r text-slate-900">Available</th>
+                    <th className="px-4 py-2 border-r">Required</th>
+                    <th className="px-4 py-2 border-r text-slate-900">Available</th>
+                    <th className="px-4 py-2 border-r">Required</th>
+                    <th className="px-4 py-2 border-r text-slate-900 border-r-0">Available</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {NBA_DATA.map((data, idx) => {
+                    const rf = data.students / 20;
+                    return (
+                      <tr key={idx} className="hover:bg-slate-50 transition-colors font-medium">
+                        <td className="px-4 py-5 text-left font-bold border-r">{data.year}</td>
+                        <td className="px-4 py-5 border-r">{(rf / 9).toFixed(1)}</td>
+                        <td className="px-4 py-5 border-r font-black text-slate-900">{data.professors}</td>
+                        <td className="px-4 py-5 border-r">{(2 * rf / 9).toFixed(1)}</td>
+                        <td className="px-4 py-5 border-r font-black text-slate-900">{data.associateProfessors}</td>
+                        <td className="px-4 py-5 border-r">{(6 * rf / 9).toFixed(1)}</td>
+                        <td className="px-4 py-5 border-r font-black text-slate-900">{data.assistantProfessors}</td>
+                        <td className="px-4 py-5 text-xl font-black text-indigo-600">{calculateCadre(data)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="p-6 bg-slate-100 rounded-xl border border-slate-200">
+              <h4 className="text-xs font-black uppercase text-slate-400 mb-3 tracking-widest leading-none">Cadre Marks Calculation</h4>
+              <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
+                Formula: [ (Available Professors / Required) + (Avail Assoc. Prof / Req Assoc. Prof) * 0.6 + (Avail Asst. Prof / Req Asst. Prof) * 0.4 ] * 12.5
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 5.5 Tab */}
+        {activeTab === '5.5' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-8 bg-slate-900 text-white rounded-2xl shadow-xl">
+              <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
+                <TrendingDown />
+                5.5 Faculty Retention
+              </h2>
+              <p className="opacity-80 text-sm font-medium">Assessment of institutional stability through faculty tenure track.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="card-gradient bg-white p-8">
+                <h4 className="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">Experience Distribution</h4>
+                <div className="space-y-4">
+                  {['experienceA', 'experienceB', 'experienceC', 'experienceD'].map((key) => {
+                    const latest = NBA_DATA[0] as any;
+                    const labels: any = { experienceA: '>= 5 Years', experienceB: '3-5 Years', experienceC: '1-3 Years', experienceD: '< 1 Year' };
+                    const colors: any = { experienceA: 'bg-emerald-500', experienceB: 'bg-indigo-500', experienceC: 'bg-blue-500', experienceD: 'bg-slate-300' };
+                    const percentage = (latest[key] / latest.facultyCount * 100).toFixed(1);
+                    
+                    return (
+                      <div key={key} className="space-y-2">
+                        <div className="flex justify-between text-xs font-black uppercase">
+                          <span>{labels[key]}</span>
+                          <span className="text-slate-400">{latest[key]} Faculty ({percentage}%)</span>
+                        </div>
+                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                          <div className={`h-full ${colors[key]} transition-all duration-1000`} style={{ width: `${percentage}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="card-gradient bg-white p-8 overflow-x-auto">
+                <h4 className="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">Historical Performance</h4>
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-[10px] uppercase font-black text-slate-500 border-b">
+                    <tr>
+                      <th className="px-4 py-4 text-left">Academic Year</th>
+                      <th className="px-4 py-4 text-center">Total Faculty</th>
+                      <th className="px-4 py-4 text-center text-emerald-600">Retention Score</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {NBA_DATA.map((data, idx) => (
+                      <tr key={idx}>
+                        <td className="px-4 py-4 font-bold">{data.year}</td>
+                        <td className="px-4 py-4 text-center">{data.facultyCount}</td>
+                        <td className="px-4 py-4 text-center text-lg font-black text-slate-900">{data.retentionScore} / 10</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
