@@ -16,7 +16,10 @@ import {
   TrendingDown,
   LayoutDashboard,
   Upload,
-  Search
+  Search,
+  Plus,
+  Trash2,
+  X
 } from 'lucide-react';
 import { NBA_DATA, YearData, FacultyEntry } from './data';
 
@@ -35,7 +38,47 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('summary');
   const [facultyList, setFacultyList] = useState<FacultyEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newFaculty, setNewFaculty] = useState<Partial<FacultyEntry>>({
+    nature: 'Regular',
+    currentlyAssociated: true,
+    experience: 0,
+    degree: '',
+    presentDesignation: ''
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleManualAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    const entry: FacultyEntry = {
+      ...newFaculty as FacultyEntry,
+      sn: facultyList.length + 1,
+      name: newFaculty.name || 'Unknown',
+      pan: newFaculty.pan || '',
+      degree: newFaculty.degree || '',
+      university: newFaculty.university || '',
+      specialization: newFaculty.specialization || '',
+      joiningDate: newFaculty.joiningDate || '',
+      experience: Number(newFaculty.experience) || 0,
+      joiningDesignation: newFaculty.joiningDesignation || '',
+      presentDesignation: newFaculty.presentDesignation || '',
+      nature: newFaculty.nature || 'Regular',
+      currentlyAssociated: newFaculty.currentlyAssociated ?? true,
+    };
+    setFacultyList(prev => [...prev, entry]);
+    setIsAddModalOpen(false);
+    setNewFaculty({
+      nature: 'Regular',
+      currentlyAssociated: true,
+      experience: 0,
+      degree: '',
+      presentDesignation: ''
+    });
+  };
+
+  const deleteFaculty = (sn: number) => {
+    setFacultyList(prev => prev.filter(f => f.sn !== sn).map((f, i) => ({ ...f, sn: i + 1 })));
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -258,22 +301,31 @@ export default function App() {
         {activeTab === 'faculty' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input 
-                  type="text" 
-                  placeholder="Search by name, degree, or designation..." 
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                <div className="relative w-full md:w-96">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input 
+                    type="text" 
+                    placeholder="Search by name, degree, or designation..." 
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <button 
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md shrink-0"
+                >
+                  <Plus size={16} />
+                  Add Faculty
+                </button>
               </div>
               <div className="text-xs font-bold text-slate-400 uppercase">
                 Showing {filteredFaculty.length} Faculty Members
               </div>
             </div>
 
-            <div className="card-gradient bg-white">
+            <div className="card-gradient bg-white overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 text-[10px] uppercase font-black text-slate-400 text-center">
@@ -285,12 +337,13 @@ export default function App() {
                       <th className="px-6 py-4">Designation</th>
                       <th className="px-6 py-4">Association</th>
                       <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredFaculty.length > 0 ? (
                       filteredFaculty.map((f, i) => (
-                        <tr key={i} className="hover:bg-slate-50 transition-colors">
+                        <tr key={i} className="hover:bg-slate-50 transition-colors group">
                           <td className="px-6 py-4 text-left text-slate-400 font-mono">{f.sn}</td>
                           <td className="px-6 py-4 text-left font-bold text-slate-900">{f.name}</td>
                           <td className="px-6 py-4 text-center">
@@ -308,11 +361,19 @@ export default function App() {
                           <td className="px-6 py-4 text-center">
                             <div className={`w-2 h-2 rounded-full mx-auto ${f.currentlyAssociated ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
                           </td>
+                          <td className="px-6 py-4 text-center">
+                            <button 
+                              onClick={() => deleteFaculty(f.sn)}
+                              className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="px-6 py-32 text-center">
+                        <td colSpan={8} className="px-6 py-32 text-center">
                           <div className="flex flex-col items-center gap-4">
                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300">
                               <Users size={32} />
@@ -356,6 +417,130 @@ export default function App() {
                   <span className="text-slate-900 uppercase tracking-tighter">Column 12: Associated</span>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {isAddModalOpen && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="px-8 py-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">Add New Faculty</h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manual Entry Form</p>
+                </div>
+                <button 
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <form onSubmit={handleManualAdd} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Name</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. Dr. Jane Smith"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.name || ''}
+                      onChange={e => setNewFaculty({...newFaculty, name: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Employee PAN</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. ABCDE1234F"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.pan || ''}
+                      onChange={e => setNewFaculty({...newFaculty, pan: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Qualification (Degree)</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. Ph.D"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.degree || ''}
+                      onChange={e => setNewFaculty({...newFaculty, degree: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Designation</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. Associate Professor"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.presentDesignation || ''}
+                      onChange={e => setNewFaculty({...newFaculty, presentDesignation: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Experience (Years)</label>
+                    <input 
+                      type="number" 
+                      step="0.1"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.experience || 0}
+                      onChange={e => setNewFaculty({...newFaculty, experience: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Joining Date</label>
+                    <input 
+                      type="date"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.joiningDate || ''}
+                      onChange={e => setNewFaculty({...newFaculty, joiningDate: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Nature of Association</label>
+                    <select 
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/10 transition-all"
+                      value={newFaculty.nature || 'Regular'}
+                      onChange={e => setNewFaculty({...newFaculty, nature: e.target.value})}
+                    >
+                      <option value="Regular">Regular</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Adjunct">Adjunct</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-3 pt-6">
+                    <input 
+                      type="checkbox" 
+                      id="currentlyAssociated"
+                      className="w-5 h-5 rounded-lg border-slate-300 text-blue-900 focus:ring-blue-900"
+                      checked={newFaculty.currentlyAssociated}
+                      onChange={e => setNewFaculty({...newFaculty, currentlyAssociated: e.target.checked})}
+                    />
+                    <label htmlFor="currentlyAssociated" className="text-[10px] font-black uppercase text-slate-900 cursor-pointer">Currently Associated</label>
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-slate-100 flex gap-4">
+                  <button 
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="flex-1 px-6 py-4 bg-blue-900 text-white rounded-2xl font-bold shadow-lg shadow-blue-900/20 hover:bg-blue-800 transition-all"
+                  >
+                    Save Faculty Record
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
